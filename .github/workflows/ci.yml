@@ -40,12 +40,12 @@ jobs:
 
             - name: Build Sphinx docs
               run: |
-                sphinx-build docs docs/_build/html
+                sphinx-build docs docs/_build
             
             - name: Deploy docs to GitHub Pages
               uses: peaceiris/actions-gh-pages@v4
               if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
               with:
                 github_token: ${{ secrets.GH_PAGES_DEPLOY_TOKEN }}
-                publish_dir: docs/_build/html
+                publish_dir: docs/_build
                 force_orphan: true
