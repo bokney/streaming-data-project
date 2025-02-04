@@ -13,6 +13,9 @@ logs/
 *.log
 *.log.*
 
+# built documentation
+docs/_build/
+
 # virtual environment
 venv/
 
