@@ -34,7 +34,7 @@ jobs:
               run: |
                 export MYPYPATH=pwd
                 pip install mypy
-                mypy .
+                mypy --explicit-package-bases .
             
             - name: Run tests
               run: |
