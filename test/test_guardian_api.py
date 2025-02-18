@@ -1,5 +1,4 @@
 
-import os
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, UTC
@@ -42,19 +41,18 @@ class TestGuardianArticle:
         assert article.webPublicationDate == expected_date
 
 
-class TestGuardianAPI:
-    @pytest.fixture
-    def guardian_api(self):
-        with patch("os.path.exists", return_value=True):
-            with patch("dotenv.load_dotenv", lambda *args, **kwargs: None):
-                with patch.dict(
-                    os.environ, {
-                        "GUARDIAN_KEY": "ABCDEFG",
-                        "SQS_QUEUE_URL": "https://sqs.test.queue/url"
-                    }, clear=True
-                ):
-                    yield GuardianAPI()
+@pytest.fixture
+def guardian_api(monkeypatch):
+    monkeypatch.setattr("os.path.exists", lambda _: True)
+    monkeypatch.setattr("dotenv.load_dotenv", lambda *_, **__: None)
+    monkeypatch.setenv("GUARDIAN_KEY", "ABCDEFG")
+    monkeypatch.setenv("SQS_QUEUE_URL", "https://sqs.test.queue/url")
+    monkeypatch.setenv("AWS_REGION", "eu-west-2")
 
+    return GuardianAPI()
+
+
+class TestGuardianAPI:
     @patch("src.guardian_api.requests.get")
     def test_get_content_successful(self, mock_requests_get, guardian_api):
         sample_response = {
