@@ -9,7 +9,10 @@ class TestConfig:
         monkeypatch.setattr("src.config.load_dotenv", lambda: None)
         monkeypatch.setattr(Config, "_instance", None)
 
-    def test_is_singleton(self):
+    def test_is_singleton(self, monkeypatch):
+        monkeypatch.setenv("GUARDIAN_KEY", "test_guardian_key")
+        monkeypatch.setenv("SQS_QUEUE_URL", "test_sqs_url")
+
         config1 = Config()
         config2 = Config()
         assert config1 is config2
