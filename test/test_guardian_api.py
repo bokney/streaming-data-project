@@ -9,9 +9,11 @@ from src.guardian_api import GuardianArticle, GuardianAPI
 class TestGuardianArticle:
     def test_post_init_date_conversion(self):
         article = GuardianArticle(
-            id="uk-news/2025/jan/11/"
+            id=(
+                "uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-"
-                "on-peak-district-road-says-council",
+                "on-peak-district-road-says-council"
+            ),
             type="article",
             sectionId="uk-news",
             sectionName="UK news",
@@ -48,7 +50,7 @@ class TestGuardianAPI:
                 with patch.dict(
                     os.environ, {
                         "GUARDIAN_KEY": "ABCDEFG",
-                        "SQS_QUEUE_URL": "https://test_sqs_queue_url.com"
+                        "SQS_QUEUE_URL": "https://sqs.test.queue/url"
                     }, clear=True
                 ):
                     yield GuardianAPI()
