@@ -1,5 +1,6 @@
 
 import os
+from typing import Optional
 from dotenv import load_dotenv
 
 
@@ -44,7 +45,7 @@ class Config:
             )
 
     @property
-    def guardian_api_key(self) -> str:
+    def guardian_api_key(self) -> Optional[str]:
         """
         Return the Guardian API key.
 
@@ -54,7 +55,7 @@ class Config:
         return os.getenv("GUARDIAN_KEY")
 
     @property
-    def sqs_queue_url(self) -> str:
+    def sqs_queue_url(self) -> Optional[str]:
         """
         Return the SQS queue URL.
 
