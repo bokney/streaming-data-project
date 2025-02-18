@@ -30,8 +30,14 @@ class SQSPublisher:
         Initializes the SQSPublisher.
         """
         self.__config = Config()
+
         self.queue_url = self.__config.sqs_queue_url
-        self.__client = boto3.client("sqs")
+        self.aws_region = self.__config.aws_region
+
+        self.__client = boto3.client(
+            "sqs",
+            region_name=self.aws_region
+        )
 
     def publish_message(self, message: SQSMessage):
         """
