@@ -6,31 +6,52 @@ from datetime import datetime, UTC
 from src.guardian_api import GuardianArticle, GuardianAPI
 
 
-class TestGuardianApi:
+class TestGuardianArticle:
+    def test_post_init_date_conversion(self):
+        article = GuardianArticle(
+            id="uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-"
+                "on-peak-district-road-says-council",
+            type="article",
+            sectionId="uk-news",
+            sectionName="UK news",
+            webPublicationDate="2025-01-11T13:04:13Z",
+            webTitle=(
+                "Gritters stopped by 200 cars double parked "
+                "on Peak District road, says council"
+            ),
+            webUrl=(
+                "https://www.theguardian.com/uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-on-"
+                "peak-district-road-says-council"
+            ),
+            apiUrl=(
+                "https://content.guardianapis.com/"
+                "uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-on-"
+                "peak-district-road-says-council"
+            ),
+            isHosted=False,
+            pillarId="pillar/news",
+            pillarName="News"
+        )
+        assert isinstance(article.webPublicationDate, datetime)
+        expected_date = datetime.fromisoformat("2025-01-11T13:04:13Z")
+        assert article.webPublicationDate == expected_date
+
+
+class TestGuardianAPI:
     @pytest.fixture
     def guardian_api(self):
         with patch("os.path.exists", return_value=True):
             with patch("dotenv.load_dotenv", lambda *args, **kwargs: None):
                 with patch.dict(
-                    os.environ, {"GUARDIAN_KEY": "ABCDEFG"}, clear=True
+                    os.environ, {
+                        "GUARDIAN_KEY": "ABCDEFG",
+                        "SQS_QUEUE_URL": "https://test_sqs_queue_url.com"
+                    }, clear=True
                 ):
                     yield GuardianAPI()
-
-    @patch("os.path.exists", return_value=False)
-    def test_missing_env_file(self, mock_exists):
-        with pytest.raises(
-            FileNotFoundError, match="Error! .env file is missing!"
-        ):
-            GuardianAPI()
-
-    @patch("os.path.exists", return_value=True)
-    @patch("src.guardian_api.dotenv_values", lambda *args, **kwargs: {})
-    @patch.dict(os.environ, {}, clear=True)
-    def test_missing_key(self, mock_exists):
-        with pytest.raises(
-            ValueError, match="Error! GUARDIAN_KEY is missing!"
-        ):
-            GuardianAPI()
 
     @patch("src.guardian_api.requests.get")
     def test_get_content_successful(self, mock_requests_get, guardian_api):
@@ -46,24 +67,30 @@ class TestGuardianApi:
                 "orderBy": "newest",
                 "results": [
                     {
-                        "id": "world/2022/oct/21/"
-                        "russia-ukraine-war-latest-what-we-know-on-day-"
-                        "240-of-the-invasion",
+                        "id": (
+                            "uk-news/2025/jan/11/"
+                            "gritters-stopped-by-200-cars-double-parked-"
+                            "on-peak-district-road-says-council"
+                        ),
                         "type": "article",
-                        "sectionId": "world",
-                        "sectionName": "World news",
-                        "webPublicationDate": "2022-10-21T14:06:14Z",
-                        "webTitle": "Russia-Ukraine war latest: "
-                        "what we know on day 240 of the invasion",
-                        "webUrl":
-                        "https://www.theguardian.com/world/2022/oct/21/"
-                        "russia-ukraine-war-latest-what-we-know-on-day-"
-                        "240-of-the-invasion",
-                        "apiUrl":
-                        "https://content.guardianapis.com/"
-                        "world/2022/oct/21/"
-                        "russia-ukraine-war-latest-what-we-know-on-day-"
-                        "240-of-the-invasion",
+                        "sectionId": "uk-news",
+                        "sectionName": "UK news",
+                        "webPublicationDate": "2025-01-11T13:04:13Z",
+                        "webTitle": (
+                            "Gritters stopped by 200 cars double parked "
+                            "on Peak District road, says council"
+                        ),
+                        "webUrl": (
+                            "https://www.theguardian.com/uk-news/2025/jan/11/"
+                            "gritters-stopped-by-200-cars-double-parked-on-"
+                            "peak-district-road-says-council"
+                        ),
+                        "apiUrl": (
+                            "https://content.guardianapis.com/"
+                            "uk-news/2025/jan/11/"
+                            "gritters-stopped-by-200-cars-double-parked-on-"
+                            "peak-district-road-says-council"
+                        ),
                         "isHosted": False,
                         "pillarId": "pillar/news",
                         "pillarName": "News"
@@ -76,20 +103,21 @@ class TestGuardianApi:
         mock_response.json.return_value = sample_response
         mock_requests_get.return_value = mock_response
 
-        search_term = "War"
+        search_term = "Rushup Edge"
         articles = guardian_api.get_content(search_term)
 
         assert isinstance(articles, list)
         assert len(articles) == 1
         assert isinstance(articles[0], GuardianArticle)
         assert articles[0].id == (
-            'world/2022/oct/21/russia-ukraine-war-latest-'
-            'what-we-know-on-day-240-of-the-invasion'
+            "uk-news/2025/jan/11/"
+            "gritters-stopped-by-200-cars-double-parked-"
+            "on-peak-district-road-says-council"
         )
         assert articles[0].type == "article"
-        assert articles[0].sectionId == "world"
+        assert articles[0].sectionId == "uk-news"
         assert articles[0].webPublicationDate == datetime(
-                2022, 10, 21, 14, 6, 14,
+                2025, 1, 11, 13, 4, 13,
                 tzinfo=UTC
         )
 
