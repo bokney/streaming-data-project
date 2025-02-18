@@ -63,3 +63,13 @@ class Config:
             str: The SQS queue URL.
         """
         return os.getenv("SQS_QUEUE_URL")
+
+    @property
+    def aws_region(self) -> Optional[str]:
+        """
+        Return the AWS region.
+
+        Returns:
+            str: The AWS region.
+        """
+        return os.getenv("AWS_REGION")
