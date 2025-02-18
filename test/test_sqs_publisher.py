@@ -6,6 +6,7 @@ import hashlib
 from moto import mock_aws
 from src.sqs_publisher import SQSPublisher, SQSMessage
 
+
 class TestSQSMessage:
     def test_to_json(self):
         message = SQSMessage(
@@ -44,11 +45,13 @@ def sqs_queue():
         queue = sqs.create_queue(QueueName="test-queue")
         yield queue
 
+
 @pytest.fixture
 def sqs_publisher(monkeypatch, sqs_queue):
     monkeypatch.setenv("GUARDIAN_KEY", "ABCDEFG")
     monkeypatch.setenv("SQS_QUEUE_URL", sqs_queue.url)
     return SQSPublisher()
+
 
 class TestSQSPublisher:
     def test_publish_message_success(self, sqs_publisher, sqs_queue):
