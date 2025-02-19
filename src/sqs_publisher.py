@@ -7,10 +7,6 @@ from dataclasses import dataclass, asdict
 from src.config import Config
 
 
-class SQSPublishException(Exception):
-    pass
-
-
 @dataclass
 class SQSMessage:
     webPublicationDate: str
@@ -53,11 +49,11 @@ class SQSPublisher:
             )
 
         except ClientError as e:
-            raise SQSPublishException(
+            raise RuntimeError(
                 f"Failed to send SQS message due to client error: {e}"
             ) from e
         except Exception as e:
-            raise SQSPublishException(
+            raise RuntimeError(
                 f"Unexpected error sending SQS message: {e}"
             ) from e
 
