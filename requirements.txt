@@ -1,3 +1,5 @@
+alabaster==1.0.0
+babel==2.17.0
 boto3==1.36.22
 botocore==1.36.22
 botocore-stubs==1.36.22
@@ -5,8 +7,10 @@ certifi==2025.1.31
 cffi==1.17.1
 charset-normalizer==3.4.1
 cryptography==44.0.1
+docutils==0.21.2
 flake8==7.1.2
 idna==3.10
+imagesize==1.4.1
 iniconfig==2.0.0
 Jinja2==3.1.5
 jmespath==1.0.1
@@ -20,6 +24,7 @@ pluggy==1.5.0
 pycodestyle==2.12.1
 pycparser==2.22
 pyflakes==3.2.0
+Pygments==2.19.1
 pytest==8.3.4
 pytest-testdox==3.1.0
 python-dateutil==2.9.0.post0
@@ -27,8 +32,19 @@ python-dotenv==1.0.1
 PyYAML==6.0.2
 requests==2.32.3
 responses==0.25.6
+roman-numerals-py==3.0.0
 s3transfer==0.11.2
 six==1.17.0
+snowballstemmer==2.2.0
+Sphinx==8.2.0
+sphinx-rtd-theme==3.0.2
+sphinxcontrib-applehelp==2.0.0
+sphinxcontrib-devhelp==2.0.0
+sphinxcontrib-htmlhelp==2.1.0
+sphinxcontrib-jquery==4.1
+sphinxcontrib-jsmath==1.0.1
+sphinxcontrib-qthelp==2.0.0
+sphinxcontrib-serializinghtml==2.0.0
 types-awscrt==0.23.10
 types-boto3==1.36.22
 types-requests==2.32.0.20241016
