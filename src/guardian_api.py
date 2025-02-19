@@ -1,8 +1,8 @@
 
 import requests
-from typing import Dict, List
 from datetime import datetime
 from dataclasses import dataclass
+from typing import Optional, Dict, List
 from src.config import Config
 
 
@@ -39,9 +39,15 @@ class GuardianAPI:
             "format": "json"
         }
 
-    def get_content(self, query: str) -> List[GuardianArticle]:
+    def get_content(
+            self,
+            query: str,
+            date_from: Optional[datetime] = None
+            ) -> List[GuardianArticle]:
         url = "https://content.guardianapis.com/search?"
         params = {"q": query}
+        if date_from:
+            params["from-date"] = date_from.strftime("%Y-%m-%d")
 
         try:
             response = requests.get(

@@ -104,7 +104,10 @@ class TestGuardianAPI:
         mock_requests_get.return_value = mock_response
 
         search_term = "Rushup Edge"
-        articles = guardian_api.get_content(search_term)
+        date_from = datetime(2022, 12, 25, 15, 30)
+        expected_date_str = "2022-12-25"
+
+        articles = guardian_api.get_content(search_term, date_from)
 
         assert isinstance(articles, list)
         assert len(articles) == 1
@@ -120,6 +123,9 @@ class TestGuardianAPI:
                 2025, 1, 11, 13, 4, 13,
                 tzinfo=UTC
         )
+        called_params = mock_requests_get.call_args[1].get("params", {})
+        assert called_params.get("q") == search_term
+        assert called_params.get("from-date") == expected_date_str
 
     @patch(
         "src.guardian_api.requests.get",
