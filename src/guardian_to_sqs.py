@@ -8,9 +8,13 @@ from src.sqs_publisher import SQSPublisher, SQSMessage
 class GuardianToSQS:
     def __init__(
             self,
-            guardian_api: GuardianAPI = GuardianAPI(),
-            sqs_publisher: SQSPublisher = SQSPublisher()
+            guardian_api: Optional[GuardianAPI] = None,
+            sqs_publisher: Optional[SQSPublisher] = None
             ) -> None:
+        if guardian_api is None:
+            guardian_api = GuardianAPI()
+        if sqs_publisher is None:
+            sqs_publisher = SQSPublisher()
         self._guardian_api = guardian_api
         self._sqs_publisher = sqs_publisher
 
