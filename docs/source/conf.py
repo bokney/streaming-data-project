@@ -20,7 +20,10 @@ author = 'bokney'
 add_module_names = False
 modindex_common_prefix = ['src.']
 
-extensions = ['sphinx.ext.autodoc',]
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx_autodoc_typehints',
+]
 
 templates_path = ['_templates']
 exclude_patterns = []
