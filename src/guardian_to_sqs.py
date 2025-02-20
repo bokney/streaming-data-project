@@ -122,6 +122,7 @@ if __name__ == "__main__":
     try:
         pipeline = GuardianToSQS()
         pipeline.transfer_articles(args.query, date_from)
+        print("Transfer completed successfully.")
 
     except Exception as e:
         raise e
