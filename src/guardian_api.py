@@ -9,6 +9,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional, Dict, List
 from src.config import Config
+from src.rate_control import backoff, rate_limit
 
 
 @dataclass
@@ -79,6 +80,8 @@ class GuardianAPI:
             "format": "json"
         }
 
+    @rate_limit(max_calls=50)
+    @backoff(delay=2, retries=4)
     def get_content(
             self,
             query: str,
