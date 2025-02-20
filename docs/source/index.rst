@@ -11,4 +11,4 @@ streaming data project documentation
    :caption: Contents:
 
    overview
-   modules
+   components
