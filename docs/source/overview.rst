@@ -56,7 +56,7 @@ To run the pipeline from the command line, execute:
 Example
 -------
 To search for articles related to "machine learning" starting from January 1,
-2025, run:
+2023, run:
 
 .. code-block:: bash
 
