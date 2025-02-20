@@ -8,5 +8,5 @@ Components
    config
    guardian_api
    guardian_to_sqs
-   sqs_publisher
    rate_control
+   sqs_publisher
