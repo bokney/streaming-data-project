@@ -54,7 +54,7 @@ class Config:
         Return the Guardian API key.
 
         Returns:
-            str: The Guardian API key.
+            Optional[str]: The Guardian API key.
         """
         return os.getenv("GUARDIAN_KEY")
 
@@ -64,7 +64,7 @@ class Config:
         Return the SQS queue URL.
 
         Returns:
-            str: The SQS queue URL.
+            Optional[str]: The SQS queue URL.
         """
         return os.getenv("SQS_QUEUE_URL")
 
@@ -74,6 +74,6 @@ class Config:
         Return the AWS region.
 
         Returns:
-            str: The AWS region.
+            Optional[str]: The AWS region, or None if not set.
         """
         return os.getenv("AWS_REGION")
