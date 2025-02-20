@@ -9,3 +9,4 @@ Components
    guardian_api
    guardian_to_sqs
    sqs_publisher
+   rate_control
