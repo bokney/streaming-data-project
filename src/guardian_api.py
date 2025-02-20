@@ -39,8 +39,8 @@ class GuardianArticle:
     webUrl: str
     apiUrl: str
     isHosted: bool
-    pillarId: str
-    pillarName: str
+    pillarId: str = ""
+    pillarName: str = ""
 
     def __post_init__(self):
         """
