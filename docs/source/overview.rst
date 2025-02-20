@@ -29,6 +29,9 @@ Ensure the following variables are set in your environment or included in a
   published.
 - **AWS_REGION**: The AWS region in which your SQS queue is located.
 
+In addition, the application requires valid AWS credentials to interact with
+AWS SQS.
+
 A sample ``.env`` file might look like:
 
 .. code-block:: text
