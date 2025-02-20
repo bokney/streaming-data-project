@@ -13,10 +13,12 @@ sys.path.insert(0, os.path.abspath('../..'))
 project = 'streaming data project'
 copyright = '2025, bokney'
 author = 'bokney'
-release = '0.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+add_module_names = False
+modindex_common_prefix = ['src.']
 
 extensions = ['sphinx.ext.autodoc',]
 
