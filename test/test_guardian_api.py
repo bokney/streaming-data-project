@@ -1,8 +1,14 @@
 
+import time
 import pytest
 from unittest.mock import patch, MagicMock
 from datetime import datetime, UTC
 from src.guardian_api import GuardianArticle, GuardianAPI
+
+
+@pytest.fixture(autouse=True)
+def disable_sleep(monkeypatch):
+    monkeypatch.setattr(time, 'sleep', lambda _: None)
 
 
 class TestGuardianArticle:
