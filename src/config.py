@@ -1,4 +1,8 @@
 
+"""
+Configuration file for environment variable access.
+"""
+
 import os
 from typing import Optional
 from dotenv import load_dotenv
@@ -9,7 +13,7 @@ class Config:
     Singleton class for environment variable validation and access.
 
     This class loads environment variables from a .env file and ensures
-    required varables are present, raising an EnvironmentError if any
+    required varables are present, raising an :exc:`OSError` if any
     are missing. It implements the singleton pattern so only one
     instance exists across the whole application.
     """
@@ -33,13 +37,13 @@ class Config:
         Ensure required environment variables are present.
 
         Raises:
-            EnvironmentError: If one or more required environment
+            OSError: If one or more required environment
             variables are missing.
         """
         required = ["GUARDIAN_KEY", "SQS_QUEUE_URL"]
         missing = [var for var in required if not os.getenv(var)]
         if missing:
-            raise EnvironmentError(
+            raise OSError(
                 f"Missing required environment variables: "
                 f"{', '.join(missing)}"
             )
@@ -50,7 +54,7 @@ class Config:
         Return the Guardian API key.
 
         Returns:
-            str: The Guardian API key.
+            Optional[str]: The Guardian API key.
         """
         return os.getenv("GUARDIAN_KEY")
 
@@ -60,7 +64,7 @@ class Config:
         Return the SQS queue URL.
 
         Returns:
-            str: The SQS queue URL.
+            Optional[str]: The SQS queue URL.
         """
         return os.getenv("SQS_QUEUE_URL")
 
@@ -70,6 +74,6 @@ class Config:
         Return the AWS region.
 
         Returns:
-            str: The AWS region.
+            Optional[str]: The AWS region, or None if not set.
         """
         return os.getenv("AWS_REGION")

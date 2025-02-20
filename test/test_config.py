@@ -29,5 +29,5 @@ class TestConfig:
         monkeypatch.delenv("GUARDIAN_KEY", raising=False)
         monkeypatch.delenv("SQS_QUEUE_URL", raising=False)
 
-        with pytest.raises(EnvironmentError):
+        with pytest.raises(OSError):
             Config()
