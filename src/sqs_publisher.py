@@ -24,7 +24,7 @@ class SQSMessage:
     webPublicationDate: str
     webTitle: str
     webUrl: str
-    # content_preview: str
+    content_preview: str
 
     def to_json(self) -> str:
         """
@@ -33,7 +33,7 @@ class SQSMessage:
         :return: A JSON string representation of the SQSMessage.
         :rtype: str
         """
-        return json.dumps(asdict(self), indent=4)
+        return json.dumps(asdict(self), ensure_ascii=False, indent=4)
 
 
 class SQSPublisher:

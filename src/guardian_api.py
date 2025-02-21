@@ -5,6 +5,7 @@ API requests to the Guardian content service.
 """
 
 import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
 from dataclasses import dataclass
 from typing import Optional, Dict, List
@@ -30,6 +31,7 @@ class GuardianArticle:
         servers.
     :ivar pillarId: The identifier of the pillar to which the article belongs.
     :ivar pillarName: The name of the pillar.
+    :ivar body: The article body text in HTML format.
     """
     id: str
     type: str
@@ -40,8 +42,9 @@ class GuardianArticle:
     webUrl: str
     apiUrl: str
     isHosted: bool
-    pillarId: str = ""
-    pillarName: str = ""
+    pillarId: Optional[str] = None
+    pillarName: Optional[str] = None
+    body: Optional[str] = None
 
     def __post_init__(self):
         """
@@ -54,6 +57,24 @@ class GuardianArticle:
             self.webPublicationDate = datetime.fromisoformat(
                 self.webPublicationDate
             )
+
+    @property
+    def content_preview(self) -> Optional[str]:
+        """
+        Get a preview of the article's text content.
+
+        This property returns the first 1000 characters of the article's body
+        text, after stripping out all HTML tags using BeautifulSoup. If no
+        body content is available, it returns ``None``.
+
+        :return: A string containing up to the first 1000 characters of the
+            article's plain text, or ``None`` if the body is not provided.
+        """
+        if self.body:
+            soup = BeautifulSoup(self.body, "html.parser")
+            content = soup.get_text(separator=" ").strip()
+            return content[:1000].rsplit(" ", 1)[0]
+        return None
 
 
 class GuardianAPI:
@@ -101,7 +122,7 @@ class GuardianAPI:
             during the API request.
         """
         url = "https://content.guardianapis.com/search?"
-        params = {"q": query}
+        params = {"q": query, "show-fields": "body"}
         if date_from:
             params["from-date"] = date_from.strftime("%Y-%m-%d")
 
@@ -113,6 +134,8 @@ class GuardianAPI:
 
             articles = []
             for item in response.json()['response']['results']:
+                fields = item.pop("fields", {})
+                item['body'] = fields.get("body")
                 articles.append(GuardianArticle(**item))
 
             return articles

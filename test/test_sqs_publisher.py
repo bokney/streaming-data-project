@@ -19,7 +19,8 @@ class TestSQSMessage:
                 "https://www.theguardian.com/uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-on-"
                 "peak-district-road-says-council"
-            )
+            ),
+            content_preview="Gritting crews have been stopped in their tracks"
         )
         json_str = message.to_json()
         data = json.loads(json_str)
@@ -33,6 +34,9 @@ class TestSQSMessage:
                 "https://www.theguardian.com/uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-on-"
                 "peak-district-road-says-council"
+            ),
+            "content_preview": (
+                "Gritting crews have been stopped in their tracks"
             )
         }
         assert data == expected
@@ -66,7 +70,8 @@ class TestSQSPublisher:
                 "https://www.theguardian.com/uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-on-"
                 "peak-district-road-says-council"
-            )
+            ),
+            content_preview="Gritting crews have been stopped in their tracks"
         )
         response = sqs_publisher.publish_message(message)
         assert "MessageId" in response
@@ -82,7 +87,8 @@ class TestSQSPublisher:
                 "https://www.theguardian.com/uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-on-"
                 "peak-district-road-says-council"
-            )
+            ),
+            content_preview="Gritting crews have been stopped in their tracks"
         )
         message_body = message.to_json()
         expected_md5 = hashlib.md5(message_body.encode('utf-8')).hexdigest()
@@ -111,7 +117,8 @@ class TestSQSPublisher:
                 "https://www.theguardian.com/uk-news/2025/jan/11/"
                 "gritters-stopped-by-200-cars-double-parked-on-"
                 "peak-district-road-says-council"
-            )
+            ),
+            content_preview="Gritting crews have been stopped in their tracks"
         )
         message_body = message.to_json()
         expected_md5 = hashlib.md5(message_body.encode('utf-8')).hexdigest()
