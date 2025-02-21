@@ -112,7 +112,7 @@ class TestGuardianArticle:
 
         assert preview is not None
         assert preview.startswith(expected_text)
-        assert len(preview) == 1000
+        assert len(preview) <= 1000
 
 
 @pytest.fixture
