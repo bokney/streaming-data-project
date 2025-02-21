@@ -46,6 +46,74 @@ class TestGuardianArticle:
         expected_date = datetime.fromisoformat("2025-01-11T13:04:13Z")
         assert article.webPublicationDate == expected_date
 
+    def test_content_preview(self):
+        article = GuardianArticle(
+            id=(
+                "uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-"
+                "on-peak-district-road-says-council"
+            ),
+            type="article",
+            sectionId="uk-news",
+            sectionName="UK news",
+            webPublicationDate="2025-01-11T13:04:13Z",
+            webTitle=(
+                "Gritters stopped by 200 cars double parked "
+                "on Peak District road, says council"
+            ),
+            webUrl=(
+                "https://www.theguardian.com/uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-on-"
+                "peak-district-road-says-council"
+            ),
+            apiUrl=(
+                "https://content.guardianapis.com/"
+                "uk-news/2025/jan/11/"
+                "gritters-stopped-by-200-cars-double-parked-on-"
+                "peak-district-road-says-council"
+            ),
+            isHosted=False,
+            pillarId="pillar/news",
+            pillarName="News",
+            body=(
+                "<p>Gritting crews have been stopped in their tracks "
+                "by “about 200 cars” double parked on a road along the "
+                "Peak District.</p> <p>Derbyshire county council said crews "
+                "were prevented from gritting the roads on Saturday morning "
+                "due to parking on both sides of road at Rushup Edge and Mam "
+                "Nick near Edale.</p> <p>In a post on X, the council said: "
+                "“We have issues with cars double parked on Rushup Edge and "
+                "Man [m] Nick on the road down to Edale. Our gritters cannot "
+                "get through with around 200 cars in the area. Please move "
+                "your car if you are in the area. If we can’t get through "
+                "neither would a bus or fire engine. Thanks.”</p> <p>The "
+                "council asked drivers “not to add to the problems on these "
+                "roads”.</p> <p>A statement added: “We realise that people "
+                "want to enjoy the Peak District, but this level of parking "
+                "is making the gritters’ job very difficult.”</p> <p>"
+                "Freezing temperatures coupled with snowfall have led to "
+                "disruption on the roads around north Derbyshire all week."
+                "</p> <p>Roads shut in Derbyshire include Goyts Lane near "
+                "Buxton, Rylah Hill in Palterton, Back Lane in Youlgrave "
+                "and Curbar Lane, Curbar.</p> <p>Earlier this week, "
+                "Derbyshire county council warned drivers in parts of the "
+                "county not to venture out after closing more than 20 "
+                "roads: “Take care if you are travelling on the roads, and "
+                "remember never to drive into flood water or through road "
+                "closure signs which are there for your safety.</p> <p>"
+                "“We’ll continue to monitor the weather conditions and "
+                "we’ll do our very best to keep Derbyshire moving.”</p>"
+            )
+        )
+
+        expected_text = "Gritting crews have been stopped in their tracks"
+
+        preview = article.content_preview
+
+        assert preview is not None
+        assert preview.startswith(expected_text)
+        assert len(preview) == 1000
+
 
 @pytest.fixture
 def guardian_api(monkeypatch):
