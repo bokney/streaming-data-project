@@ -8,7 +8,7 @@ a command-line interface (CLI) to automate the process of retrieving,
 transforming, and forwarding data.
 
 How to install
-==============
+--------------
 The project is hosted on GitHub. To install it, clone the repository and
 install the required packages:
 
@@ -19,7 +19,7 @@ install the required packages:
    pip install -r requirements.txt
 
 How to configure
-================
+----------------
 The module requires several environment variables for proper operation.
 Ensure the following variables are set in your environment or included in a
 ``.env`` file in the project root:
@@ -41,7 +41,7 @@ A sample ``.env`` file might look like:
    AWS_REGION=your_aws_region
 
 How to use
-==========
+----------
 The module can be used both as a library and as a standalone CLI tool.
 To run the pipeline from the command line, execute:
 
@@ -54,7 +54,7 @@ To run the pipeline from the command line, execute:
   specific date (formatted as YYYY-MM-DD).
 
 Example
--------
+*******
 To search for articles related to "machine learning" starting from January 1,
 2023, run:
 
@@ -62,3 +62,12 @@ To search for articles related to "machine learning" starting from January 1,
 
    python src/guardian_to_sqs.py "machine learning" --date-from 2023-01-01
 
+Running Tests
+-------------
+
+This project uses **pytest** as its testing framework.
+To run all tests, execute:
+
+.. code-block:: bash
+
+   pytest
