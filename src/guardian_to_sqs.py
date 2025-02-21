@@ -85,7 +85,11 @@ class GuardianToSQS:
                 "%Y-%m-%dT%H:%M:%SZ"
             ),
             webTitle=article.webTitle,
-            webUrl=str(article.webUrl)
+            webUrl=str(article.webUrl),
+            content_preview=(
+                "" if article.content_preview is None
+                else article.content_preview
+            )
         )
 
 
