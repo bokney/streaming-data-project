@@ -4,8 +4,12 @@ Configuration file for environment variable access.
 """
 
 import os
+import threading
 from typing import Optional
 from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 class Config:
@@ -19,6 +23,7 @@ class Config:
     """
 
     _instance = None
+    _lock = threading.Lock()
 
     def __new__(cls):
         """
@@ -26,47 +31,51 @@ class Config:
         Returns the singleton instance.
         """
         if cls._instance is None:
-            cls._instance = super(Config, cls).__new__(cls)
-            load_dotenv()
-            cls._validate_env_vars()
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super(Config, cls).__new__(cls)
         return cls._instance
 
-    @classmethod
-    def _validate_env_vars(cls):
+    @staticmethod
+    def _get_env_var(var_name: str, required: bool = True) -> Optional[str]:
         """
-        Ensure required environment variables are present.
-
-        Raises:
-            OSError: If one or more required environment
-            variables are missing.
+        Retrieve an environment variable.
+        Raises an error if required and missing.
+        :param var_name: The name of the environment variable.
+        :type var_name: str
+        :param required: Whether the variable is mandatory.
+        :type required: bool
+        :returns: The environment variable value if found,
+            or None if not required.
+        :rtype: str | None
+        :raises OSError: If a required environment variable is missing.
         """
-        required = ["GUARDIAN_KEY", "SQS_QUEUE_URL"]
-        missing = [var for var in required if not os.getenv(var)]
-        if missing:
+        value = os.getenv(var_name)
+        if required and value is None:
             raise OSError(
-                f"Missing required environment variables: "
-                f"{', '.join(missing)}"
+                f"Missing required environment variable: {var_name}"
             )
+        return value
 
     @property
-    def guardian_api_key(self) -> Optional[str]:
+    def guardian_api_key(self) -> str:
         """
         Return the Guardian API key.
 
         Returns:
-            Optional[str]: The Guardian API key.
+            str: The Guardian API key.
         """
-        return os.getenv("GUARDIAN_KEY")
+        return self._get_env_var("GUARDIAN_KEY")
 
     @property
-    def sqs_queue_url(self) -> Optional[str]:
+    def sqs_queue_url(self) -> str:
         """
         Return the SQS queue URL.
 
         Returns:
-            Optional[str]: The SQS queue URL.
+            str: The SQS queue URL.
         """
-        return os.getenv("SQS_QUEUE_URL")
+        return self._get_env_var("SQS_QUEUE_URL")
 
     @property
     def aws_region(self) -> Optional[str]:
@@ -76,4 +85,4 @@ class Config:
         Returns:
             Optional[str]: The AWS region, or None if not set.
         """
-        return os.getenv("AWS_REGION")
+        return self._get_env_var("AWS_REGION", required=False)
