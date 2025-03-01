@@ -52,7 +52,7 @@ class Config:
         return value
 
     @property
-    def sqs_queue_url(self) -> Optional[str]:
+    def sqs_queue_url(self) -> str:
         """
         Return the SQS queue URL.
 
