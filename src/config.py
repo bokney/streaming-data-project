@@ -58,7 +58,7 @@ class Config:
         return value
 
     @property
-    def guardian_api_key(self) -> str:
+    def guardian_api_key(self) -> Optional[str]:
         """
         Return the Guardian API key.
 
@@ -68,7 +68,7 @@ class Config:
         return self._get_env_var("GUARDIAN_KEY")
 
     @property
-    def sqs_queue_url(self) -> str:
+    def sqs_queue_url(self) -> Optional[str]:
         """
         Return the SQS queue URL.
 
