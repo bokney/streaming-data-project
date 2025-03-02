@@ -49,7 +49,7 @@ class GuardianArticle:
     pillarName: Optional[str] = None
     body: Optional[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Post-initialization validation.
 
@@ -100,7 +100,7 @@ class GuardianAPI:
     """
     _config = Config()
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the GuardianAPI client.
 
