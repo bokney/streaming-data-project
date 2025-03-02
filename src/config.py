@@ -4,12 +4,14 @@ Configuration file for environment variable access.
 """
 
 import os
+import logging
 import threading
 from typing import Optional
 from dotenv import load_dotenv
 
 
 load_dotenv()
+logger = logging.getLogger(__name__)
 
 
 class Config:
@@ -33,6 +35,7 @@ class Config:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
+                    logger.debug("Creating a new Config instance.")
                     cls._instance = super(Config, cls).__new__(cls)
         return cls._instance
 
@@ -46,9 +49,13 @@ class Config:
         """
         value = os.getenv("GUARDIAN_KEY")
         if value is None:
+            logger.error(
+                "Missing required environment variable: GUARDIAN_KEY"
+            )
             raise OSError(
                 "Missing required environment variable: GUARDIAN_KEY"
             )
+        logger.debug("Guardian API key successfully retrieved.")
         return value
 
     @property
@@ -61,9 +68,13 @@ class Config:
         """
         value = os.getenv("SQS_QUEUE_URL")
         if value is None:
+            logger.error(
+                "Missing required environment variable: SQS_QUEUE_URL"
+            )
             raise OSError(
                 "Missing required environment variable: SQS_QUEUE_URL"
             )
+        logger.debug("SQS queue URL successfully retrieved.")
         return value
 
     @property
@@ -74,4 +85,9 @@ class Config:
         Returns:
             Optional[str]: The AWS region, or None if not set.
         """
-        return os.getenv("AWS_REGION")
+        value = os.getenv("AWS_REGION")
+        if value:
+            logger.debug("AWS region set to %s", value)
+        else:
+            logger.debug("No AWS region set.")
+        return value
