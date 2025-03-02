@@ -34,7 +34,7 @@ class TestConfig:
 
         with pytest.raises(OSError):
             config = Config()
-            guardian_api_key = config.guardian_api_key
+            config.guardian_api_key
 
     def test_missing_sqs_queue_url(self, monkeypatch):
         monkeypatch.setenv("GUARDIAN_KEY", "test_guardian_key")
@@ -42,7 +42,7 @@ class TestConfig:
 
         with pytest.raises(OSError):
             config = Config()
-            sqs_queue_url = config.sqs_queue_url
+            config.sqs_queue_url
 
     def test_optional_aws_region(self, monkeypatch):
         monkeypatch.setenv("GUARDIAN_KEY", "test_guardian_key")
