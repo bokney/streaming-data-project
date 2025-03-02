@@ -29,7 +29,7 @@ AWS_REGION=your_aws_region
 Additionally, ensure you have valid AWS credentials to interact with AWS SQS.
 
 ```text
-   export AWS_PROFILE=your_profile_name
+export AWS_PROFILE=your_profile_name
 ```
 
 ## Usage
