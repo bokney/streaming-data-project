@@ -64,7 +64,7 @@ To search for articles related to "machine learning" starting from January 1,
 
 .. code-block:: bash
 
-   python src/guardian_to_sqs.py "machine learning" --date-from 2023-01-01
+   python src/guardian_to_sqs.py '"machine learning"' --date-from 2023-01-01
 
 Running Tests
 -------------
