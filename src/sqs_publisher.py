@@ -48,7 +48,7 @@ class SQSPublisher:
     """
     _config = Config()
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the SQSPublisher.
 
@@ -67,7 +67,7 @@ class SQSPublisher:
             self.queue_url, self.aws_region
         )
 
-    def publish_message(self, message: SQSMessage):
+    def publish_message(self, message: SQSMessage) -> dict:
         """Publish a JSON-formatted message to the SQS queue.
 
         This method sends the message and verifies that the MD5 checksum of
