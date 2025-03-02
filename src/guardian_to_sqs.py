@@ -47,7 +47,9 @@ class GuardianToSQS:
     def transfer_articles(
             self,
             query: str,
-            date_from: Optional[datetime] = None
+            date_from: Optional[datetime] = None,
+            date_to: Optional[datetime] = None,
+            max_articles: int = 10
             ) -> None:
         """
         Transfer articles from the Guardian API to AWS SQS.
@@ -60,11 +62,20 @@ class GuardianToSQS:
         :type query: str
         :param date_from: Optional start date for filtering articles.
         :type date_from: Optional[datetime]
+        :param date_to: Optional end date for filtering articles.
+        :type date_to: Optional[datetime]
+        :param max_articles: Maximum amount of articles to retrieve.
+        :type max_articles: int
         :raises Exception: Propagates any exception that occurs during
             transfer.
         """
         try:
-            articles = self._guardian_api.get_content(query, date_from)
+            articles = self._guardian_api.get_content(
+                query=query,
+                date_from=date_from,
+                date_to=date_to,
+                max_articles=max_articles
+            )
             for article in articles:
                 message = self._transform(article)
                 self._sqs_publisher.publish_message(message)
@@ -77,13 +88,18 @@ class GuardianToSQS:
 
         :param article: A GuardianArticle instance to transform.
         :type article: GuardianArticle
-        :return: An SQSMessage containing selected fields from the article.
+        :returns: An SQSMessage containing selected fields from the article.
         :rtype: SQSMessage
+        :meta public:
         """
+        if isinstance(article.webPublicationDate, datetime):
+            pub_date = (
+                article.webPublicationDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
+        else:
+            pub_date = article.webPublicationDate
         return SQSMessage(
-            webPublicationDate=article.webPublicationDate.strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            ),
+            webPublicationDate=pub_date,
             webTitle=article.webTitle,
             webUrl=str(article.webUrl),
             content_preview=(
@@ -104,12 +120,23 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "query",
-        help="Search query for retrieving Guardian articles"
+        help="Search query for retrieving Guardian articles."
     )
     parser.add_argument(
         "--date-from",
         help="Start date for filtering articles (format: YYYY-MM-DD)",
         default=None
+    )
+    parser.add_argument(
+        "--date-to",
+        help="End date for filtering articles (format: YYYY-MM-DD)",
+        default=None
+    )
+    parser.add_argument(
+        "--max-articles",
+        type=int,
+        help="Maximum amount of articles to retrieve. Default is 10.",
+        default=10
     )
     args = parser.parse_args()
 
@@ -123,9 +150,31 @@ if __name__ == "__main__":
             )
             exit(1)
 
+    date_to = None
+    if args.date_to:
+        try:
+            date_to = datetime.strptime(args.date_to, "%Y-%m-%d")
+        except ValueError:
+            print(
+                "Invalid date format for --date-to. Please use YYYY-MM-DD."
+            )
+            exit(1)
+
+    max_articles = None
+    if args.max_articles <= 0:
+        print(
+            "Invalid value for --max-articles. Must be > 0."
+        )
+        exit(1)
+
     try:
         pipeline = GuardianToSQS()
-        pipeline.transfer_articles(args.query, date_from)
+        pipeline.transfer_articles(
+            query=args.query,
+            date_from=date_from,
+            date_to=date_to,
+            max_articles=args.max_articles
+        )
         print("Transfer completed successfully.")
 
     except Exception as e:

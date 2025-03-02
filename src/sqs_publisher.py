@@ -20,6 +20,7 @@ class SQSMessage:
     :ivar webPublicationDate: The publication date in string format.
     :ivar webTitle: The title of the web article.
     :ivar webUrl: The URL of the web article.
+    :ivar content_preview: The first 1000 characters of the article.
     """
     webPublicationDate: str
     webTitle: str
@@ -42,7 +43,7 @@ class SQSPublisher:
 
     Uses AWS credentials and queue url from the environment.
     """
-    __config: Config
+    _config = Config()
 
     def __init__(self):
         """
@@ -51,14 +52,12 @@ class SQSPublisher:
         Loads the SQS queue URL and AWS region from the configuration and
         creates an SQS client using boto3.
         """
-        self.__config = Config()
-
-        self.queue_url = self.__config.sqs_queue_url
-        self.aws_region = self.__config.aws_region
+        self.queue_url = self._config.sqs_queue_url
+        self.aws_region = self._config.aws_region
 
         self.__client = boto3.client(
             "sqs",
-            region_name=self.aws_region
+            region_name=self.aws_region or "eu-west-2"
         )
 
     def publish_message(self, message: SQSMessage):

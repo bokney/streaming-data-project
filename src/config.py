@@ -4,8 +4,12 @@ Configuration file for environment variable access.
 """
 
 import os
+import threading
 from typing import Optional
 from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 class Config:
@@ -19,6 +23,7 @@ class Config:
     """
 
     _instance = None
+    _lock = threading.Lock()
 
     def __new__(cls):
         """
@@ -26,47 +31,40 @@ class Config:
         Returns the singleton instance.
         """
         if cls._instance is None:
-            cls._instance = super(Config, cls).__new__(cls)
-            load_dotenv()
-            cls._validate_env_vars()
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super(Config, cls).__new__(cls)
         return cls._instance
 
-    @classmethod
-    def _validate_env_vars(cls):
-        """
-        Ensure required environment variables are present.
-
-        Raises:
-            OSError: If one or more required environment
-            variables are missing.
-        """
-        required = ["GUARDIAN_KEY", "SQS_QUEUE_URL"]
-        missing = [var for var in required if not os.getenv(var)]
-        if missing:
-            raise OSError(
-                f"Missing required environment variables: "
-                f"{', '.join(missing)}"
-            )
-
     @property
-    def guardian_api_key(self) -> Optional[str]:
+    def guardian_api_key(self) -> str:
         """
         Return the Guardian API key.
 
         Returns:
-            Optional[str]: The Guardian API key.
+            str: The Guardian API key.
         """
-        return os.getenv("GUARDIAN_KEY")
+        value = os.getenv("GUARDIAN_KEY")
+        if value is None:
+            raise OSError(
+                "Missing required environment variable: GUARDIAN_KEY"
+            )
+        return value
 
     @property
-    def sqs_queue_url(self) -> Optional[str]:
+    def sqs_queue_url(self) -> str:
         """
         Return the SQS queue URL.
 
         Returns:
-            Optional[str]: The SQS queue URL.
+            str: The SQS queue URL.
         """
-        return os.getenv("SQS_QUEUE_URL")
+        value = os.getenv("SQS_QUEUE_URL")
+        if value is None:
+            raise OSError(
+                "Missing required environment variable: SQS_QUEUE_URL"
+            )
+        return value
 
     @property
     def aws_region(self) -> Optional[str]:

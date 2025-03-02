@@ -118,12 +118,19 @@ class TestGuardianToSQS:
             guardian_api=guardian_api, sqs_publisher=sqs_publisher
         )
 
-        query = "Rushup Edge"
+        query = '"Rushup Edge"'
         date_from = datetime(2023, 3, 1, 0, 0, 0)
+        date_to = datetime(2025, 2, 1)
 
-        pipeline.transfer_articles(query, date_from)
+        pipeline.transfer_articles(query, date_from, date_to, max_articles=10)
 
-        guardian_api.get_content.assert_called_once_with(query, date_from)
+        guardian_api.get_content.assert_called_once_with(
+            query='"Rushup Edge"',
+            date_from=datetime(2023, 3, 1, 0, 0, 0),
+            date_to=datetime(2025, 2, 1),
+            max_articles=10
+        )
+
         sqs_publisher.publish_message.assert_called_once()
         published_message = sqs_publisher.publish_message.call_args[0][0]
         expected_date_str = test_date.strftime("%Y-%m-%dT%H:%M:%SZ")
