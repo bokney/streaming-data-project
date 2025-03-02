@@ -92,10 +92,14 @@ class GuardianToSQS:
         :rtype: SQSMessage
         :meta public:
         """
+        if isinstance(article.webPublicationDate, datetime):
+            pub_date = (
+                article.webPublicationDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+            )
+        else:
+            pub_date = article.webPublicationDate
         return SQSMessage(
-            webPublicationDate=article.webPublicationDate.strftime(
-                "%Y-%m-%dT%H:%M:%SZ"
-            ),
+            webPublicationDate=pub_date,
             webTitle=article.webTitle,
             webUrl=str(article.webUrl),
             content_preview=(
