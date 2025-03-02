@@ -37,8 +37,8 @@ python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD]
 ```
 
 - Replace `[QUERY_STRING]` with the query string you wish to search for.
-- Optionally, use `--date-from` to filter articles published from a specific date (YYYY-MM-DD format).
-- Optionally, use `--date-to` to filter articles published before a specific date (YYYY-MM-DD format).
+- Optionally, use `--date-from` or `--date-to` flags to filter articles published from
+  or before a specific date (formatted as YYYY-MM-DD).
 
 ### Example
 
