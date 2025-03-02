@@ -104,6 +104,7 @@ class GuardianAPI:
             self,
             query: str,
             date_from: Optional[datetime] = None,
+            date_to: Optional[datetime] = None,
             max_articles: int = 10
             ) -> List[GuardianArticle]:
         """
@@ -114,6 +115,8 @@ class GuardianAPI:
         :param date_from: Optionally filter articles published from this date
             onward.
         :type date_from: Optional[datetime]
+        :param date_to: Optionally filter articles published before this date.
+        :type date_to: Optional[datetime]
         :returns: A list of :class:`GuardianArticle` instances that match
             the query.
         :param max_articles: Maximum amount of articles to retireve. Defaults
@@ -131,6 +134,8 @@ class GuardianAPI:
         params = {"q": query, "show-fields": "body"}
         if date_from:
             params["from-date"] = date_from.strftime("%Y-%m-%d")
+        if date_to:
+            params["to-date"] = date_to.strftime("%Y-%m-%d")
 
         articles: List = []
         current_page = 1
