@@ -19,7 +19,7 @@ class Config:
     Singleton class for environment variable validation and access.
 
     This class loads environment variables from a .env file and ensures
-    required varables are present, raising an :exc:`OSError` if any
+    required variables are present, raising an :exc:`OSError` if any
     are missing. It implements the singleton pattern so only one
     instance exists across the whole application.
     """
@@ -42,10 +42,10 @@ class Config:
     @property
     def guardian_api_key(self) -> str:
         """
-        Return the Guardian API key.
-
-        Returns:
-            str: The Guardian API key.
+        :returns: The Guardian API key.
+        :rtype: str
+        :raises OSError: If the 'GUARDIAN_KEY' environment variable
+            is not set.
         """
         value = os.getenv("GUARDIAN_KEY")
         if value is None:
@@ -61,10 +61,10 @@ class Config:
     @property
     def sqs_queue_url(self) -> str:
         """
-        Return the SQS queue URL.
-
-        Returns:
-            str: The SQS queue URL.
+        :returns: The SQS queue URL.
+        :rtype: str
+        :raises OSError: If the 'SQS_QUEUE_URL' environment variable
+            is not set.
         """
         value = os.getenv("SQS_QUEUE_URL")
         if value is None:
@@ -80,10 +80,8 @@ class Config:
     @property
     def aws_region(self) -> Optional[str]:
         """
-        Return the AWS region.
-
-        Returns:
-            Optional[str]: The AWS region, or None if not set.
+        :returns: The AWS region, or None if not set.
+        :rtype: Optional[str]
         """
         value = os.getenv("AWS_REGION")
         if value:
