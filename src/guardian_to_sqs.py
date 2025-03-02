@@ -7,10 +7,17 @@ them to an AWS SQS queue using a SQSPublisher client.
 It also provides a command-line interface to run the pipeline.
 """
 
+import logging
 from typing import Optional
 from datetime import datetime
 from src.guardian_api import GuardianAPI, GuardianArticle
 from src.sqs_publisher import SQSPublisher, SQSMessage
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 
 class GuardianToSQS:
@@ -44,6 +51,8 @@ class GuardianToSQS:
         self._guardian_api = guardian_api
         self._sqs_publisher = sqs_publisher
 
+        logger.info("GuardianToSQS initialized.")
+
     def transfer_articles(
             self,
             query: str,
@@ -69,6 +78,10 @@ class GuardianToSQS:
         :raises Exception: Propagates any exception that occurs during
             transfer.
         """
+        logger.info(
+            "Starting transfer for query: '%s' (max_articles=%d)",
+            query, max_articles
+        )
         try:
             articles = self._guardian_api.get_content(
                 query=query,
@@ -76,10 +89,14 @@ class GuardianToSQS:
                 date_to=date_to,
                 max_articles=max_articles
             )
+            logger.info("Retrieved %d articles.", len(articles))
+
             for article in articles:
                 message = self._transform(article)
                 self._sqs_publisher.publish_message(message)
+
         except Exception as e:
+            logger.exception("Error during article transfer: %s", str(e))
             raise e
 
     def _transform(self, article: GuardianArticle) -> SQSMessage:
@@ -92,13 +109,16 @@ class GuardianToSQS:
         :rtype: SQSMessage
         :meta public:
         """
+        logger.debug("Transforming article: %s", article.webTitle)
+
         if isinstance(article.webPublicationDate, datetime):
             pub_date = (
                 article.webPublicationDate.strftime("%Y-%m-%dT%H:%M:%SZ")
             )
         else:
             pub_date = article.webPublicationDate
-        return SQSMessage(
+
+        message = SQSMessage(
             webPublicationDate=pub_date,
             webTitle=article.webTitle,
             webUrl=str(article.webUrl),
@@ -107,6 +127,9 @@ class GuardianToSQS:
                 else article.content_preview
             )
         )
+
+        logger.debug("Transformed article into SQSMessage: %s", message)
+        return message
 
 
 if __name__ == "__main__":

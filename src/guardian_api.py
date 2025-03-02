@@ -4,6 +4,7 @@ This module provides classes for representing Guardian articles and making
 API requests to the Guardian content service.
 """
 
+import logging
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -11,6 +12,8 @@ from dataclasses import dataclass
 from typing import Optional, List, Union
 from src.config import Config
 from src.rate_control import backoff, rate_limit
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -54,9 +57,20 @@ class GuardianArticle:
         :class:`datetime` object.
         """
         if isinstance(self.webPublicationDate, str):
-            self.webPublicationDate = datetime.fromisoformat(
-                self.webPublicationDate
-            )
+            try:
+                self.webPublicationDate = datetime.fromisoformat(
+                    self.webPublicationDate
+                )
+                logger.debug(
+                    "Converted webPublicationDate to datetime for article %s",
+                    self.id
+                )
+            except ValueError as e:
+                logger.error(
+                    "Invalid date format for article %s: %s",
+                    self.id, e
+                )
+                raise
 
     @property
     def content_preview(self) -> Optional[str]:
@@ -97,6 +111,10 @@ class GuardianAPI:
             "api-key": self._config.guardian_api_key,
             "format": "json"
         }
+        logger.debug(
+            "GuardianAPI initialized with headers: %s",
+            {k: v for k, v in self._headers.items() if k != "api-key"}
+        )
 
     @rate_limit(max_calls=50)
     @backoff(delay=2, retries=4)
@@ -137,7 +155,8 @@ class GuardianAPI:
         if date_to:
             params["to-date"] = date_to.strftime("%Y-%m-%d")
 
-        articles: List = []
+        logger.info("Fetching Guardian content with params: %s", params)
+        articles: List[GuardianArticle] = []
         current_page = 1
 
         while len(articles) < max_articles:
@@ -145,13 +164,22 @@ class GuardianAPI:
             params["page-size"] = str(page_size)
             params["page"] = str(current_page)
 
+            logger.debug(
+                "Requesting page %s with page-size %s",
+                current_page, page_size
+            )
             try:
                 response = requests.get(
                     url=url, headers=self._headers, params=params
                 )
                 response.raise_for_status()
+                logger.debug(
+                    "Received response with status code %s",
+                    response.status_code
+                )
 
             except requests.exceptions.RequestException as e:
+                logger.error("Error getting Guardian content: %s", e)
                 raise requests.exceptions.RequestException(
                     f"Error getting Guardian content: {e}"
                 ) from e
@@ -160,11 +188,18 @@ class GuardianAPI:
 
             response_data = data.get("response")
             if response_data is None:
+                logger.error(
+                    "Invalid response structure: 'response' key not found."
+                )
                 raise ValueError(
                     "Invalid response structure: 'response' key not found."
                 )
 
             if response_data.get("status") != "ok":
+                logger.error(
+                    "API returned a non-ok status: %s",
+                    response_data.get("status")
+                )
                 raise ValueError(
                     "API returned a non-ok status: "
                     f"{response_data.get('status')}"
@@ -172,25 +207,58 @@ class GuardianAPI:
 
             results = response_data.get("results")
             if results is None:
+                logger.error(
+                    "Invalid response structure: "
+                    "'results' key not found in response."
+                )
                 raise ValueError(
                     "Invalid response structure: "
                     "'results' key not found in response."
                 )
 
             if not results:
+                logger.info(
+                    "No results returned on page %s. Exiting loop.",
+                    current_page
+                )
                 break
 
+            logger.debug(
+                "Processing %s results from page %s",
+                len(results), current_page
+            )
             for item in results:
                 fields = item.pop("fields", {})
                 item["body"] = fields.get("body")
-                articles.append(GuardianArticle(**item))
+                try:
+                    article = GuardianArticle(**item)
+                except Exception as e:
+                    logger.error(
+                        "Error creating GuardianArticle for item %s: %s",
+                        item.get("id", "unknown"), e
+                    )
+                    continue
+                articles.append(article)
                 if len(articles) >= max_articles:
+                    logger.debug(
+                        "Reached requested max_articles limit: %s",
+                        max_articles
+                    )
                     break
 
             total_pages = response_data.get("pages")
             if total_pages is None or current_page >= total_pages:
+                logger.info(
+                    "Reached the last page or total_pages info is missing. "
+                    "Ending pagination."
+                )
                 break
 
             current_page += 1
+            logger.debug("Moving to next page: %s", current_page)
 
+        logger.info(
+            "Successfully retrieved %s articles from the Guardian API.",
+            len(articles)
+        )
         return articles
