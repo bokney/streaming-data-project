@@ -1,5 +1,5 @@
 
-# streaming-data-project     [![Documentation Status](https://readthedocs.org/projects/streaming-data-project/badge/?version=latest)](https://streaming-data-project.readthedocs.io/en/latest/?badge=latest)
+# streaming-data-project     [![Documentation Status](https://readthedocs.org/projects/streaming-data-project/badge/?version=latest)](https://streaming-data-project.readthedocs.io/en/latest/?badge=latest)[![GitHub Actions Status](https://github.com/bokney/streaming-data-project/actions/workflows/main.yml/badge.svg?event=push)](https://github.com/bokney/streaming-data-project/actions/workflows/main.yml)
 
 ## Overview
 
