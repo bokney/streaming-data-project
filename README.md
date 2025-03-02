@@ -46,10 +46,10 @@ python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD] [--date-to
 
 ### Example
 
-To search for articles related to '"machine learning"' starting from January 1, 2023:
+To search for articles related to "machine learning" starting from January 1, 2023:
 
 ```bash
-python src/guardian_to_sqs.py "machine learning" --date-from 2023-01-01
+python src/guardian_to_sqs.py '"machine learning"' --date-from 2023-01-01
 ```
 
 ## Running Tests
