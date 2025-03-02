@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from dataclasses import dataclass
-from typing import Optional, Dict, List
+from typing import Optional, List, Union
 from src.config import Config
 from src.rate_control import backoff, rate_limit
 
@@ -23,7 +23,7 @@ class GuardianArticle:
     :ivar sectionId: The section identifier where the article belongs.
     :ivar sectionName: The name of the section.
     :ivar webPublicationDate: The publication date of the article as a
-        :class:`datetime` object.
+        :class:`datetime` object or string.
     :ivar webTitle: The title of the article.
     :ivar webUrl: The URL of the article on the web.
     :ivar apiUrl: The API URL for the article.
@@ -37,7 +37,7 @@ class GuardianArticle:
     type: str
     sectionId: str
     sectionName: str
-    webPublicationDate: datetime
+    webPublicationDate: Union[datetime, str]
     webTitle: str
     webUrl: str
     apiUrl: str
@@ -84,8 +84,7 @@ class GuardianAPI:
     This class uses an API key retrieved from the environment to make
     requests to the Guardian API.
     """
-    __config: Config
-    __headers: Dict
+    _config = Config()
 
     def __init__(self):
         """
@@ -94,10 +93,8 @@ class GuardianAPI:
         Loads configuration from the environment and sets up the required
         request headers.
         """
-        self.__config = Config()
-
-        self.__headers = {
-            "api-key": self.__config.guardian_api_key,
+        self._headers = {
+            "api-key": self._config.guardian_api_key,
             "format": "json"
         }
 
@@ -106,41 +103,89 @@ class GuardianAPI:
     def get_content(
             self,
             query: str,
-            date_from: Optional[datetime] = None
+            date_from: Optional[datetime] = None,
+            max_articles: int = 10
             ) -> List[GuardianArticle]:
         """
         Retrieve articles from the Guardian API matching the specified query.
 
         :param query: The search query string.
-        :param date_from: Optional; filter articles published from this date
+        :type query: str
+        :param date_from: Optionally filter articles published from this date
             onward.
         :type date_from: Optional[datetime]
         :returns: A list of :class:`GuardianArticle` instances that match
             the query.
+        :param max_articles: Maximum amount of articles to retireve. Defaults
+            to 10.
+        :type max_articles: int
         :rtype: List[GuardianArticle]
         :raises requests.exceptions.RequestException: If there is an error
             during the API request.
         """
-        url = "https://content.guardianapis.com/search?"
+        if max_articles <= 0:
+            return []
+
+        url = "https://content.guardianapis.com/search"
+
         params = {"q": query, "show-fields": "body"}
         if date_from:
             params["from-date"] = date_from.strftime("%Y-%m-%d")
 
-        try:
-            response = requests.get(
-                url=url, headers=self.__headers, params=params
-            )
-            response.raise_for_status()
+        articles: List = []
+        current_page = 1
 
-            articles = []
-            for item in response.json()['response']['results']:
+        while len(articles) < max_articles:
+            page_size = min(max_articles - len(articles), 50)
+            params["page-size"] = str(page_size)
+            params["page"] = str(current_page)
+
+            try:
+                response = requests.get(
+                    url=url, headers=self._headers, params=params
+                )
+                response.raise_for_status()
+
+            except requests.exceptions.RequestException as e:
+                raise requests.exceptions.RequestException(
+                    f"Error getting Guardian content: {e}"
+                ) from e
+
+            data = response.json()
+
+            response_data = data.get("response")
+            if response_data is None:
+                raise ValueError(
+                    "Invalid response structure: 'response' key not found."
+                )
+
+            if response_data.get("status") != "ok":
+                raise ValueError(
+                    "API returned a non-ok status: "
+                    f"{response_data.get('status')}"
+                )
+
+            results = response_data.get("results")
+            if results is None:
+                raise ValueError(
+                    "Invalid response structure: "
+                    "'results' key not found in response."
+                )
+
+            if not results:
+                break
+
+            for item in results:
                 fields = item.pop("fields", {})
-                item['body'] = fields.get("body")
+                item["body"] = fields.get("body")
                 articles.append(GuardianArticle(**item))
+                if len(articles) >= max_articles:
+                    break
 
-            return articles
+            total_pages = response_data.get("pages")
+            if total_pages is None or current_page >= total_pages:
+                break
 
-        except requests.exceptions.RequestException as e:
-            raise requests.exceptions.RequestException(
-                f"Error getting Guardian content: {e}"
-            ) from e
+            current_page += 1
+
+        return articles
