@@ -47,10 +47,10 @@ To run the pipeline from the command line, execute:
 
 .. code-block:: bash
 
-   python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD]
+   python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD] [--date-to YYYY-MM-DD]
 
 - Replace ``[QUERY_STRING]`` with the query string you wish to search for.
-- Optionally, use the ``--date-from`` or ``--date-to`` flags to filter articles published from
+- Optionally, use the ``--date-from`` and/or ``--date-to`` flags to filter articles published from
   or before a specific date (formatted as YYYY-MM-DD).
 
 Example

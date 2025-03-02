@@ -33,11 +33,11 @@ Additionally, ensure you have valid AWS credentials to interact with AWS SQS.
 The module can be used as a library or a standalone CLI tool. To run the pipeline from the command line:
 
 ```bash
-python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD]
+python src/guardian_to_sqs.py [QUERY_STRING] [--date-from YYYY-MM-DD] [--date-to YYYY-MM-DD]
 ```
 
 - Replace `[QUERY_STRING]` with the query string you wish to search for.
-- Optionally, use `--date-from` or `--date-to` flags to filter articles published from
+- Optionally, use `--date-from` and/or `--date-to` flags to filter articles published from
   or before a specific date (formatted as YYYY-MM-DD).
 
 ### Example
