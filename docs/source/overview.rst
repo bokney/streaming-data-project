@@ -29,9 +29,6 @@ Ensure the following variables are set in your environment or included in a
   published.
 - **AWS_REGION**: The AWS region in which your SQS queue is located.
 
-In addition, the application requires valid AWS credentials to interact with
-AWS SQS.
-
 A sample ``.env`` file might look like:
 
 .. code-block:: text
@@ -39,6 +36,13 @@ A sample ``.env`` file might look like:
    GUARDIAN_KEY=your_guardian_api_key
    SQS_QUEUE_URL=https://sqs.your-region.amazonaws.com/your-account-id/your-queue
    AWS_REGION=your_aws_region
+
+In addition, the application requires valid AWS credentials to interact with
+AWS SQS. The AWS profile can be set with:
+
+.. code-block:: text
+
+   export AWS_PROFILE=your_profile_name
 
 How to use
 ----------

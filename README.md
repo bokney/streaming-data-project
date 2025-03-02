@@ -28,6 +28,10 @@ AWS_REGION=your_aws_region
 
 Additionally, ensure you have valid AWS credentials to interact with AWS SQS.
 
+```text
+   export AWS_PROFILE=your_profile_name
+```
+
 ## Usage
 
 The module can be used as a library or a standalone CLI tool. To run the pipeline from the command line:
