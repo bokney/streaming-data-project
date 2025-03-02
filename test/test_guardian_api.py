@@ -172,7 +172,7 @@ class TestGuardianAPI:
             "pillarId": "pillar",
             "pillarName": "Pillar"
         }
-    
+
     @patch("src.guardian_api.requests.get")
     def test_get_content_successful(self, mock_requests_get, guardian_api):
         sample_response = {
@@ -286,7 +286,9 @@ class TestGuardianAPI:
         mock_response_2.json.return_value = response_page_2
         mock_response_3 = MagicMock()
         mock_response_3.json.return_value = response_page_3
-        mock_requests_get.side_effect = [mock_response_1, mock_response_2, mock_response_3]
+        mock_requests_get.side_effect = [
+            mock_response_1, mock_response_2, mock_response_3
+        ]
 
         articles = guardian_api.get_content("query", None, max_articles=25)
 
@@ -330,7 +332,9 @@ class TestGuardianAPI:
         assert articles == []
 
     @patch("src.guardian_api.requests.get")
-    def test_incomplete_response_structure(self, mock_requests_get, guardian_api):
+    def test_incomplete_response_structure(
+        self, mock_requests_get, guardian_api
+    ):
         missing_response = {"no_response": {}}
         mock_response_1 = MagicMock()
         mock_response_1.json.return_value = missing_response
